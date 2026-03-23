@@ -1,29 +1,32 @@
 name: Update Translations and Wiki Status
 
+# 只在 PR 合并到 main 时触发，不在直接 push 时触发
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types:
+      - closed
     paths:
       - 'cps/**'
       - 'scripts/compile_translations.sh'
       - 'scripts/update_translations.sh'
       - 'scripts/generate_translation_status.py'
       - '.github/workflows/update-translations.yml'
+  # 也支持手动触发
   workflow_dispatch:
 
-permissions:
-  contents: write
-  actions: write
-
+# 如果是合并操作（merged: true），则执行
 jobs:
   update-translations:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
