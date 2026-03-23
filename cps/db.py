@@ -404,6 +404,12 @@ class Books(Base):
     has_cover = Column(Integer, default=0)
     uuid = Column(String)
 
+    # 扫描模式字段 (T001)
+    # source_path: 源文件的绝对路径（扫描模式使用）
+    # scan_mode: 0=导入模式(默认), 1=扫描模式
+    source_path = Column(String, default="", nullable=False)
+    scan_mode = Column(Integer, default=0, nullable=False)
+
     authors = relationship(Authors, secondary=books_authors_link, backref='books')
     tags = relationship(Tags, secondary=books_tags_link, backref='books', order_by="Tags.name")
     comments = relationship(Comments, backref='books')

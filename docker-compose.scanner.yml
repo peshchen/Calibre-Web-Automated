@@ -1,0 +1,35 @@
+---
+version: '3.8'
+
+services:
+  calibre-web-automated:
+    # 构建本地镜像（使用更新后的代码）
+    build: .
+    container_name: calibre-web-automated
+    environment:
+      - TZ=Asia/Shanghai
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      # 配置目录（数据库在这里）
+      - ./config:/config
+      # 导入目录（扫描目录）
+      - ./books:/cwa-book-ingest
+      # 图书库目录
+      - ./library:/calibre-library
+    ports:
+      - 8083:8083
+    # 使用自定义启动脚本（自动执行迁移）
+    entry: ["/scripts/docker-entrypoint.sh"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# 创建必要的目录
+networks:
+  default:
+    name: cwa-network
